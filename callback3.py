@@ -63,17 +63,26 @@ app.layout = html.Div([
      Input('xaxis-type', 'value'),
      Input('yaxis-type', 'value'),
      Input('year--slider', 'value')])
-def update_graph(xaxis_column_name, yaxis_column_name, xaxis_type, yaxis_type, year_value):
+def update_graph(xaxis_column_name, yaxis_column_name,
+                 xaxis_type, yaxis_type, 
+                 year_value):
     dff = df[df['Year'] == year_value]
 
-    fig = px.scatter(x=dff[xaxis_column_name],
-                     y=dff[yaxis_column_name],
-                     hover_name=dff['Country Name'])
+    fig = px.scatter(x=dff[dff['Indicator Name'] == xaxis_column_name]['Value'],
+                     y=dff[dff['Indicator Name'] == yaxis_column_name]['Value'],
+                     hover_name=dff[dff['Indicator Name'] == yaxis_column_name]['Country Name'])
+    
+    fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest')
 
-    fig.update_layout(xaxis={'type': 'linear' if xaxis_type == 'Linear' else 'log'},
-                      yaxis={'type': 'linear' if yaxis_type == 'Linear' else 'log'})
+    fig.update_xaxes(title=xaxis_column_name,
+                     type='linear' if xaxis_type == 'Linear' else 'log')
+
+    fig.update_yaxes(title=yaxis_column_name,
+                     type='linear' if yaxis_type == 'Linear' else 'log')
 
     return fig
+
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
